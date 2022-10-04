@@ -1,4 +1,5 @@
 using FreshMarket.Data;
+using FreshMarket.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +7,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddDbContext<ApplicationDbContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("Local_FreshMarket")));
+
+// Register custom Dependency Injection
+builder.Services.AddScoped<ProductService>();
+builder.Services.AddScoped<UserService>();
 
 var app = builder.Build();
 

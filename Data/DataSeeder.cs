@@ -13,7 +13,7 @@ namespace FreshMarket.Data
             if (dbContext == null) return;
             dbContext.Database.EnsureDeleted();
             dbContext.Database.EnsureCreated();
-            //AddProducts(dbContext); todo
+            AddProducts(dbContext);
             AddUsers(dbContext);
         }
 
@@ -25,36 +25,36 @@ namespace FreshMarket.Data
 
             db.AddRange(new Product[] 
                 {
-                    //todo: Find like Images of "market" products and implement their info
-                    new(){
-                        Name = "",
-                        Description = "",
-                        ImgUrl = "",
-                        Price = 0.50
+                    //todo: Find like Images of "market"
+                    new Product(){
+                        Name = "Orange",
+                        Description = "Orange juicy fruit.",
+                        ImgUrl = "#",
+                        Price = .25
                     },
-                    new(){
-                        Name = "",
-                        Description = "",
-                        ImgUrl = "",
-                        Price = 0.50
+                    new Product(){
+                        Name = "Strawberry",
+                        Description = "Red fruit that has seeds on the skin.",
+                        ImgUrl = "#",
+                        Price = 0.29
                     },
-                    new(){
-                        Name = "",
-                        Description = "",
-                        ImgUrl = "",
-                        Price = 0.50
+                    new Product(){
+                        Name = "Cantaloupe",
+                        Description = "Cut it up and eat it!!",
+                        ImgUrl = "#",
+                        Price = 1.25
                     },
-                    new(){
-                        Name = "",
-                        Description = "",
-                        ImgUrl = "",
-                        Price = 0.50
+                    new Product(){
+                        Name = "Avocado",
+                        Description = "Green 'fruit' that has a huge seed in the middle.",
+                        ImgUrl = "#",
+                        Price = 0.25
                     },
-                    new(){
-                        Name = "",
-                        Description = "",
-                        ImgUrl = "",
-                        Price = 0.50
+                    new Product(){
+                        Name = "Green Leaf Lettuce",
+                        Description = "Make a salad",
+                        ImgUrl = "#",
+                        Price = .75
                     },
             });
 
@@ -69,28 +69,28 @@ namespace FreshMarket.Data
 
             db.AddRange(new User[]
             {
-                new() {
+                new User() {
                     Username = "hotrod50000",
                     Password = "password",
                     FirstName = "Tony",
                     LastName = "Henderson",
                     Age = 28
                 },
-                new() {
+                new User() {
                     FirstName = "Kayla",
                     LastName = "Henderson",
                     Username = "kdawn",
                     Password = "password",
                     Age = 26
                 },
-                new() {
+                new User() {
                     FirstName = "Samuel",
                     LastName = "Henderson",
                     Username = "SammyBoy",
                     Password = "password",
                     Age = 1
                 },
-                new() {
+                new User() {
                     FirstName = "Avery",
                     LastName = "Henderson",
                     Username = "AHend",

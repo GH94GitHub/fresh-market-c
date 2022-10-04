@@ -1,13 +1,16 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace FreshMarket.Models
 {
+    [Index("Name", IsUnique = true)]
     public class Product
     {
         [Column("id")]
         public int Id { get; set; }
 
+        [Required]
         [Column("name")]
         public string Name { get; set; }
 

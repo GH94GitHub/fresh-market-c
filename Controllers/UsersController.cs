@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using FreshMarket.Data;
+﻿using Microsoft.AspNetCore.Mvc;
+using FreshMarket.Dtos;
+using FreshMarket.Exceptions;
+using FreshMarket.Exceptions.Postgres;
 using FreshMarket.Models;
+using FreshMarket.Services;
 
 namespace FreshMarket.Controllers
 {
@@ -14,95 +11,80 @@ namespace FreshMarket.Controllers
     [ApiController]
     public class UsersController : ControllerBase
     {
-        private readonly ApplicationDbContext db;
+        private readonly UserService _userService;
 
-        public UsersController(ApplicationDbContext context)
+        public UsersController(UserService userService)
         {
-            db = context;
+            _userService = userService;
         }
-
-        // GET: api/Users
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<User>>> Getusers()
-        {
-            return await db.users.ToListAsync();
-        }
-
+        
         // GET: api/Users/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<User>> GetUser(int id)
+        public async Task<ActionResult<UserDto>> GetUser(int id)
         {
-            var user = await db.users.FindAsync(id);
-
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return user;
-        }
-
-        // PUT: api/Users/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutUser(int id, User user)
-        {
-            if (id != user.Id)
-            {
-                return BadRequest();
-            }
-
-            db.Entry(user).State = EntityState.Modified;
-
             try
             {
-                await db.SaveChangesAsync();
+                return UserDto.valueOf(await _userService.GetUser(id));
             }
-            catch (DbUpdateConcurrencyException)
+            catch (UserIdNotExistsException ex)
             {
-                if (!UserExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                Console.WriteLine(ex);
+                return NotFound(ex.Message);
             }
-
-            return NoContent();
         }
 
         // POST: api/Users
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<ActionResult<User>> PostUser(User user)
+        public async Task<ActionResult<UserDto>> PostUser(User user)
         {
-            db.users.Add(user);
-            await db.SaveChangesAsync();
+            try
+            {
+                return Ok(UserDto.valueOf(await _userService.CreateUser(user)));
+            }
+            catch (ModelCannotHaveIdException ex)
+            {
+                Console.WriteLine(ex);
+                return BadRequest(ex.Message);
+            }
+            catch (UniqueViolationException uniqueViolation)
+            {
+                return BadRequest(uniqueViolation.Message);
+            }
+        }
 
-            return CreatedAtAction("GetUser", new { id = user.Id }, user);
+        // PUT: api/Users/5
+        [HttpPut("{id}")]
+        public async Task<ActionResult<UserDto>> PutUser(int id, UserDto userDto)
+        {
+            if (id != userDto.Id)
+                return BadRequest();
+
+            try
+            {
+                return UserDto.valueOf(await _userService.UpdateUser(userDto));
+            }
+            catch (UserNotExistsException ex)
+            {
+                Console.WriteLine(ex);
+                return BadRequest(ex.Message);
+            }
         }
 
         // DELETE: api/Users/5
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteUser(int id)
+        public async Task<ActionResult> DeleteUser(int id)
         {
-            var user = await db.users.FindAsync(id);
-            if (user == null)
+            try
             {
-                return NotFound();
+                await _userService.DeleteUser(id);
+                return NoContent();
             }
-
-            db.users.Remove(user);
-            await db.SaveChangesAsync();
-
-            return NoContent();
+            catch (UserIdNotExistsException ex)
+            {
+                Console.WriteLine(ex);
+                return BadRequest(ex.Message);
+            }
         }
 
-        private bool UserExists(int id)
-        {
-            return db.users.Any(e => e.Id == id);
-        }
     }
 }
