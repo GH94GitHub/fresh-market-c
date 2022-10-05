@@ -15,7 +15,7 @@ namespace FreshMarket.Exceptions.Postgres
             {
                 case PostgresErrorCodes.UniqueViolation:
                     Console.WriteLine(postgresException);
-                    throw new UniqueViolationException(typeof(T), postgresException.ColumnName);
+                    throw new UniqueViolationException(typeof(T), postgresException.ConstraintName.Split('_').Last());
                 default:
                     throw postgresException;
             }

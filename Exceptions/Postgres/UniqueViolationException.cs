@@ -2,20 +2,15 @@
 {
     public class UniqueViolationException : Exception
     {
-        private readonly object? _obj;
+        private readonly Type? _type;
         public UniqueViolationException()
         {
         }
 
-        public UniqueViolationException(object obj, string field)
-            : base($"The resource {field} must be unique")
+        public UniqueViolationException(Type type, string field)
+            : base($"The {type.Name} '{field}' must be unique")
         {
-            _obj = obj;
-        }
-
-        public object? GetConflictingObject()
-        {
-            return _obj;
+            _type = type;
         }
     }
 }
