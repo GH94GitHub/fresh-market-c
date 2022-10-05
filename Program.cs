@@ -4,11 +4,10 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddControllers();
-builder.Services.AddDbContext<ApplicationDbContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("Local_FreshMarket")));
 
-// Register custom Dependency Injection
+// Add services to the container.
+builder.Services.AddDbContext<ApplicationDbContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("Local_FreshMarket")));
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<UserService>();
 
@@ -16,11 +15,12 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
-app.UseHttpsRedirection();
-
 app.UseAuthorization();
 
-if(app.Environment.IsDevelopment())
+if(app.Environment.IsProduction())
+    app.UseHttpsRedirection(); 
+
+else if(app.Environment.IsDevelopment())
     app.Seed();
 
 app.MapControllers();
