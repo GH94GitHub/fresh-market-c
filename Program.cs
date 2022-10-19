@@ -13,6 +13,8 @@ builder.Services.AddControllers()
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("Local_FreshMarket")));
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<DishService>();
+builder.Services.AddScoped<TierService>();
 builder.Services.AddScoped<UserRepository>();
 builder.Services.AddSingleton<Mapper>(FreshMarketMapper.GetMapper());
 

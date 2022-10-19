@@ -15,7 +15,7 @@
         }
 
         public NotFoundException(int id)
-            : base($"The {typeof(T).Name} with Id:{id} cannot be found")
+            : base($"The {typeof(T).Name} with Id: {id} cannot be found")
         {
         }
 

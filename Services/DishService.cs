@@ -1,6 +1,7 @@
 ﻿using FreshMarket.Data;
 using FreshMarket.Exceptions;
 using FreshMarket.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace FreshMarket.Services
 {
@@ -16,9 +17,9 @@ namespace FreshMarket.Services
         /// <summary>
         /// Gets all dishes as an array
         /// </summary>
-        public Dish[] GetAllDishes()
+        public async Task<ICollection<Dish>> GetAllDishes()
         {
-            return _context.dishes.ToArray();
+            return await _context.dishes.ToListAsync();
         }
 
         /// <summary>

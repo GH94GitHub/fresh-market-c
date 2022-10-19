@@ -18,18 +18,18 @@ namespace FreshMarket.Controllers
 
         [HttpGet]
         [Route("")]
-        public Dish[] GetAllDishes()
+        public async Task<ActionResult<ICollection<Dish>>> GetAllDishes()
         {
-            return _dishService.GetAllDishes();
+            return Ok(await _dishService.GetAllDishes());
         }
 
         [HttpGet]
-        [Route("/{id:int}")]
+        [Route("{id:int}")]
         public async Task<ActionResult<Dish>> GetDish(int id)
         {
             try
             {
-                return await _dishService.GetDish(id);
+                return Ok(await _dishService.GetDish(id));
             }
             catch (NotFoundException<Dish> ex)
             {
