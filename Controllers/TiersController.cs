@@ -18,9 +18,9 @@ namespace FreshMarket.Controllers
 
         [HttpGet]
         [Route("")]
-        public Tier[] GetAllTiers()
+        public async Task<ActionResult<ICollection<Tier>>> GetAllTiers()
         {
-            return _tierService.GetAllTiers();
+            return Ok(await _tierService.GetAllTiers());
         }
     }
 }

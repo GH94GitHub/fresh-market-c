@@ -1,5 +1,6 @@
 ﻿using FreshMarket.Data;
 using FreshMarket.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace FreshMarket.Services
 {
@@ -12,9 +13,9 @@ namespace FreshMarket.Services
             _context = context;
         }
 
-        public Tier[] GetAllTiers()
+        public async Task<ICollection<Tier>> GetAllTiers()
         {
-            return _context.tiers.ToArray();
+            return await _context.tiers.ToListAsync();
         }
     }
 }
