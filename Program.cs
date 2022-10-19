@@ -1,15 +1,20 @@
+using AutoMapper;
 using FreshMarket.Data;
+using FreshMarket.Repositories;
 using FreshMarket.Services;
+using FreshMarket.Utils;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddNewtonsoftJson();
 
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(o => o.UseNpgsql(builder.Configuration.GetConnectionString("Local_FreshMarket")));
-builder.Services.AddScoped<ProductService>();
 builder.Services.AddScoped<UserService>();
+builder.Services.AddScoped<UserRepository>();
+builder.Services.AddSingleton<Mapper>(FreshMarketMapper.GetMapper());
 
 var app = builder.Build();
 
@@ -18,7 +23,7 @@ var app = builder.Build();
 app.UseAuthorization();
 
 if(app.Environment.IsProduction())
-    app.UseHttpsRedirection(); 
+    app.UseHttpsRedirection();
 
 else if(app.Environment.IsDevelopment())
     app.Seed();
