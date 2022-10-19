@@ -1,6 +1,6 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using FreshMarket.Models;
+using Newtonsoft.Json;
 
 namespace FreshMarket.Dtos
 {
@@ -11,20 +11,36 @@ namespace FreshMarket.Dtos
     {
         [Required]
         public int Id { get; set; }
-        [Required]
-        public string Username { get; set; }
+
         [Required]
         public string FirstName { get; set; }
+
         [Required]
         public string LastName { get; set; }
 
-        [Column("age")]
-        [Range(1, 150)]
-        public int Age { get; set; }
+        [Required]
+        public string Email { get; set; }
+
+        public ICollection<Dish> DishPreferences { get; set; }
+
+        public ICollection<Allergy> Allergies { get; set; }
+
+        [Required]
+        public Subscription Subscription { get; set; }
+
+        [Required]
+        public string Address { get; set; }
+
+        [Required]
+        public string PhoneNumber { get; set; }
+
+        [Required]
+        public Payment Payment { get; set; }
+
+
 
         public UserDto()
         {
-            Username = "";
             FirstName = "";
             LastName = "";
         }
@@ -39,28 +55,17 @@ namespace FreshMarket.Dtos
                 Id = user.Id,
                 FirstName = user.FirstName,
                 LastName = user.LastName,
-                Age = user.Age,
-                Username = user.Username
-            };
-        }
-
-        public User ToUser()
-        {
-            return new User()
-            {
-                Id = this.Id,
-                Username = this.Username,
-                Password = "",
-                FirstName = this.FirstName,
-                LastName = this.LastName,
-                Age = this.Age
+                Email = user.Email,
+                Address = user.Address,
+                Payment = user.Payment,
+                PhoneNumber = user.PhoneNumber,
+                Subscription = user.Subscription
             };
         }
 
         public override string ToString()
         {
-            return $"{nameof(Id)}: {Id}, {nameof(Username)}: {Username}, {nameof(FirstName)}: {FirstName}, {nameof(LastName)}: {LastName}, {nameof(Age)}: {Age}";
+            return $"{nameof(Id)}: {Id}, {nameof(FirstName)}: {FirstName}, {nameof(LastName)}: {LastName}, {nameof(Email)}: {Email}, {nameof(Subscription)}: {Subscription}, {nameof(Address)}: {Address}, {nameof(PhoneNumber)}: {PhoneNumber}, {nameof(Payment)}: {Payment}";
         }
-
     }
 }

@@ -1,14 +1,14 @@
-﻿namespace FreshMarket.Exceptions
+﻿namespace FreshMarket.Exceptions.UserExceptions
 {
-    public class UserIdNotExistsException :Exception
+    public class UserIdNotExistsException : Exception
     {
         private readonly int? _userId;
         public UserIdNotExistsException()
         {
         }
 
-        public UserIdNotExistsException(int id) 
-            : base($"The user with the Id: {id} does not exist")
+        public UserIdNotExistsException(int id)
+            : base($"The user with the Id: {id}, does not exist")
         {
             _userId = id;
         }

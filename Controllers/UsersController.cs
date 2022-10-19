@@ -2,8 +2,9 @@
 using FreshMarket.Dtos;
 using FreshMarket.Exceptions;
 using FreshMarket.Exceptions.Postgres;
-using FreshMarket.Models;
+using FreshMarket.Exceptions.UserExceptions;
 using FreshMarket.Services;
+using Npgsql;
 
 namespace FreshMarket.Controllers
 {
@@ -17,14 +18,14 @@ namespace FreshMarket.Controllers
         {
             _userService = userService;
         }
-        
+
         // GET: api/Users/5
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDto>> GetUser(int id)
         {
             try
             {
-                return UserDto.valueOf(await _userService.GetUser(id));
+                return await _userService.GetUser(id);
             }
             catch (UserIdNotExistsException ex)
             {
@@ -35,11 +36,11 @@ namespace FreshMarket.Controllers
 
         // POST: api/Users
         [HttpPost]
-        public async Task<ActionResult<UserDto>> PostUser(User user)
+        public async Task<ActionResult<UserDto>> PostUser(UserToCreate userToCreate)
         {
             try
             {
-                return Ok(UserDto.valueOf(await _userService.CreateUser(user)));
+                return Ok(await _userService.CreateUser(userToCreate));
             }
             catch (ModelCannotHaveIdException ex)
             {
@@ -54,16 +55,16 @@ namespace FreshMarket.Controllers
 
         // PUT: api/Users/5
         [HttpPut("{id}")]
-        public async Task<ActionResult<UserDto>> PutUser(int id, UserDto userDto)
+        public async Task<ActionResult<UserDto>> PutUser(int id, PartialUser partialUser)
         {
-            if (id != userDto.Id)
+            if (id != partialUser.Id)
                 return BadRequest();
 
             try
             {
-                return UserDto.valueOf(await _userService.UpdateUser(userDto));
+                return await _userService.UpdateUser(partialUser);
             }
-            catch (UserNotExistsException ex)
+            catch (Exception ex) when(ex is PostgresException or UniqueViolationException or UserIdNotExistsException)
             {
                 Console.WriteLine(ex);
                 return BadRequest(ex.Message);

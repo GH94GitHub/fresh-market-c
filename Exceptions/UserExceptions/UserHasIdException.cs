@@ -1,8 +1,8 @@
 ﻿using FreshMarket.Models;
 
-namespace FreshMarket.Exceptions
+namespace FreshMarket.Exceptions.UserExceptions
 {
-    public class UserHasIdException :Exception
+    public class UserHasIdException : Exception
     {
         private readonly User? _user;
 
@@ -10,7 +10,7 @@ namespace FreshMarket.Exceptions
         {
         }
 
-        public UserHasIdException(User conflictingUser) 
+        public UserHasIdException(User conflictingUser)
             : base($"The _user has an id of {conflictingUser.Id}")
         {
             _user = conflictingUser;

@@ -1,8 +1,11 @@
-﻿using FreshMarket.Data;
+﻿using AutoMapper;
+using FreshMarket.Data;
 using FreshMarket.Dtos;
 using FreshMarket.Exceptions;
 using FreshMarket.Exceptions.Postgres;
+using FreshMarket.Exceptions.UserExceptions;
 using FreshMarket.Models;
+using FreshMarket.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 
@@ -11,21 +14,25 @@ namespace FreshMarket.Services
     public class UserService
     {
         private readonly ApplicationDbContext _context;
+        private readonly Mapper _mapper;
+        private readonly UserRepository _userRepository;
 
-        public UserService(ApplicationDbContext context)
+        public UserService(ApplicationDbContext context, Mapper mapper, UserRepository userRepository)
         {
             _context = context;
+            _mapper = mapper;
+            _userRepository = userRepository;
         }
 
         /// <summary>
         /// Gets a user by Id
         /// </summary>
         /// <exception cref="UserIdNotExistsException"></exception>
-        public async Task<User> GetUser(int userId)
+        public async Task<UserDto> GetUser(int userId)
         {
-            var user = await _context.users.FindAsync(userId);
+            var user = await _userRepository.Get(userId);
 
-            return user ?? throw new UserIdNotExistsException(userId);
+            return _mapper.Map<UserDto>(user) ?? throw new UserIdNotExistsException(userId);
         }
 
         /// <summary>
@@ -34,40 +41,66 @@ namespace FreshMarket.Services
         /// <exception cref="ModelCannotHaveIdException"></exception>
         /// <exception cref="PostgresException"></exception>
         /// <exception cref="UniqueViolationException"></exception>
-        public async Task<User> CreateUser(User user)
+        public async Task<UserDto> CreateUser(UserToCreate userToCreate)
         {
-            if (user.Id != 0)
-                throw new ModelCannotHaveIdException(user);
+            if (userToCreate.Id != 0)
+                throw new ModelCannotHaveIdException(userToCreate);
 
             try
             {
+                var user = _mapper.Map<User>(userToCreate);
+
+                foreach (var userAllergy in user.Allergies)
+                {
+                    _context.Entry(userAllergy).State = EntityState.Unchanged;
+                }
+                foreach (var userDishPreference in user.DishPreferences)
+                {
+                    _context.Entry(userDishPreference).State = EntityState.Unchanged;
+                }
+                _context.Entry(user.Subscription.Tier).State = EntityState.Unchanged;
+                user.Subscription.ExpirationDate = user.Subscription.ExpirationDate.ToUniversalTime();
+
                 await _context.users.AddAsync(user);
                 await _context.SaveChangesAsync();
+                return _mapper.Map<UserDto>(user);
             }
             catch (DbUpdateException dbUpdateException)
             {
-                if (dbUpdateException.InnerException is PostgresException postgresException)
-                    postgresException.HandleException<User>();
-                else
+                if (dbUpdateException.InnerException is not PostgresException postgresException)
                     throw dbUpdateException;
+                postgresException.HandleException<User>();
+                throw dbUpdateException;
             }
-
-            return user;
         }
 
         /// <summary>
         /// Updates a user
         /// </summary>
         /// <exception cref="UserNotExistsException"></exception>
-        public async Task<User> UpdateUser(UserDto userDto)
+        /// <exception cref="PostgresException"></exception>
+        /// <exception cref="UniqueViolationException"></exception>
+        public async Task<UserDto> UpdateUser(PartialUser partialUser)
         {
-            var user = await _context.users.FindAsync(userDto.Id);
+            var user = await _userRepository.Get(partialUser.Id);
+            var type = user.Allergies.GetType();
             if (user == null)
-                throw new UserNotExistsException(userDto);
+                throw new UserIdNotExistsException(partialUser.Id);
 
-            _context.Entry(user).CurrentValues.SetValues(userDto);
-            await _context.SaveChangesAsync();
-            return user;
+            user = _mapper.Map(partialUser, user);
+            try
+            {
+                _context.Update(user);
+                await _context.SaveChangesAsync();
+                return _mapper.Map<UserDto>(user);
+            }
+            catch (DbUpdateException dbUpdateException)
+            {
+                if (dbUpdateException.InnerException is not PostgresException postgresException)
+                    throw dbUpdateException;
+                postgresException.HandleException<User>();
+                throw dbUpdateException;
+            }
         }
 
         /// <summary>
