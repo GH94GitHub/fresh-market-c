@@ -22,6 +22,7 @@ namespace FreshMarket.Utils
                 {
                     opt.Condition((source, dest, member) => member != null);
                 });
+            cfg.CreateMap<SubscriptionDto, Subscription>();
         });
 
         public static Mapper GetMapper()

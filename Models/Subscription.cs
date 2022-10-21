@@ -15,6 +15,7 @@ namespace FreshMarket.Models
         [Column("tier_id")]
         [JsonIgnore]
         public int TierId { get; set; }
+
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public Tier Tier { get; set; }
 
@@ -22,6 +23,7 @@ namespace FreshMarket.Models
         [Column("user_id")]
         [JsonIgnore]
         public int UserId { get; set; }
+
         [JsonProperty(DefaultValueHandling = DefaultValueHandling.Ignore)]
         public User? User { get; set; }
 
