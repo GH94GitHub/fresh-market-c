@@ -19,7 +19,7 @@ namespace FreshMarket.Controllers
             _userService = userService;
         }
 
-        // GET: api/Users/5
+        // GET: api/users/5
         [HttpGet("{id}")]
         public async Task<ActionResult<UserDto>> GetUser(int id)
         {
@@ -34,7 +34,7 @@ namespace FreshMarket.Controllers
             }
         }
 
-        // POST: api/Users
+        // POST: api/users
         [HttpPost]
         public async Task<ActionResult<UserDto>> PostUser(UserToCreate userToCreate)
         {
@@ -53,7 +53,7 @@ namespace FreshMarket.Controllers
             }
         }
 
-        // PUT: api/Users/5
+        // PUT: api/users/5
         [HttpPut("{id}")]
         public async Task<ActionResult<UserDto>> PutUser(int id, PartialUser partialUser)
         {
@@ -71,7 +71,7 @@ namespace FreshMarket.Controllers
             }
         }
 
-        // DELETE: api/Users/5
+        // DELETE: api/users/5
         [HttpDelete("{id}")]
         public async Task<ActionResult> DeleteUser(int id)
         {
@@ -87,5 +87,24 @@ namespace FreshMarket.Controllers
             }
         }
 
+        //PUT "api/users/5/subscription
+        [Route("{id:int}/subscription")]
+        public async Task<ActionResult<SubscriptionDto>> UpdateSubscription(int id, SubscriptionDto subscriptionDto)
+        {
+            try
+            {
+                await _userService.UpdateSubscription(id, subscriptionDto);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+                return BadRequest(ex.Message);
+            }
+
+            return Ok();
+        }
+
+        //todo: update user allergies
+        //todo: update user dish preferences
     }
 }

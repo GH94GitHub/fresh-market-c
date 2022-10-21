@@ -117,5 +117,43 @@ namespace FreshMarket.Services
             await _context.SaveChangesAsync();
             return true;
         }
+
+        /// <summary>
+        /// Changes the users subscription, or adds one if they currently don't have one
+        /// </summary>
+        /// <returns></returns>
+        /// <exception cref="UserIdNotExistsException"></exception>
+        /// <exception cref="Exception"></exception>
+        public async Task UpdateSubscription(int userId, SubscriptionDto subscriptionDto)
+        {
+            var user = await _userRepository.Get(userId);
+
+            if (user == null)
+                throw new UserIdNotExistsException(userId);
+
+            subscriptionDto.ExpirationDate = subscriptionDto.ExpirationDate.ToUniversalTime();
+            if (user.Subscription == null)
+            {
+                if (subscriptionDto.Id != 0)
+                    throw new Exception("Cannot add subscription");
+
+                user.Subscription = _mapper.Map<Subscription>(subscriptionDto);
+            }
+            else
+            {
+                if (user.Subscription.Id != subscriptionDto.Id || user.Id != subscriptionDto.UserId)
+                    throw new Exception("");
+
+
+                _context.Entry(user.Subscription).CurrentValues.SetValues(subscriptionDto);
+            }
+
+
+
+            await _context.SaveChangesAsync();
+        }
+
+        //todo: update user allergies
+        //todo: update user dish preferences
     }
 }
